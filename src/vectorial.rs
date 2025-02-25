@@ -1,10 +1,8 @@
-use core::time;
 
 use chrono::Timelike;
-use serde::Serialize;
 use strum::IntoEnumIterator;
 use svg::{
-  node::element::{path::Data, Line, Path, Rectangle, Text},
+  node::element::{Line, Rectangle, Text},
   Document,
 };
 
