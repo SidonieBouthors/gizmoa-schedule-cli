@@ -1,11 +1,15 @@
+use std::ops::Sub;
+
 use chrono::NaiveTime;
+use chrono::Timelike;
 use clap::{command, Parser};
-use hex_color::HexColor;
+use color::HexColor;
 use parser::weekday_ser;
 use serde::{Deserialize, Serialize};
 use serde_with::with_prefix;
 use strum_macros::{Display, EnumIter};
 
+use crate::color;
 use crate::parser;
 
 #[derive(Parser, Debug)]
@@ -27,7 +31,7 @@ pub struct Args {
   pub time_increment: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, EnumIter, Display)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, EnumIter, Display, Copy, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum Weekday {
   Monday,
@@ -39,11 +43,48 @@ pub enum Weekday {
   Sunday,
 }
 
+impl Weekday {
+  pub fn index(&self) -> usize {
+    *self as usize
+  }
+}
+
 with_prefix!(prefix_start "start");
 with_prefix!(prefix_end "end");
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub struct MeetTime(pub NaiveTime);
+
+impl MeetTime {
+  pub fn new(hour: u32, minute: u32) -> Self {
+    MeetTime(NaiveTime::from_hms_opt(hour, minute, 0).unwrap())
+  }
+
+  pub fn hour(&self) -> u32 {
+    self.0.hour()
+  }
+
+  pub fn minute(&self) -> u32 {
+    self.0.minute()
+  }
+
+  pub fn to_minutes(&self) -> u32 {
+    self.hour() * 60 + self.minute()
+  }
+
+  pub fn to_hours(&self) -> f32 {
+    self.hour() as f32 + self.minute() as f32 / 60.0
+  }
+}
+
+impl Sub for MeetTime {
+  type Output = Self;
+
+  fn sub(self, rhs: Self) -> Self::Output {
+    let minutes = self.to_minutes() - rhs.to_minutes();
+    MeetTime::new(minutes / 60, minutes % 60)
+  }
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -74,15 +115,15 @@ pub struct ScheduleItem {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Schedule {
-  title: String,
-  items: Vec<ScheduleItem>,
+  pub title: String,
+  pub items: Vec<ScheduleItem>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduleSave {
-  data_check: String,
-  save_version: u32,
-  schedules: Vec<Schedule>,
-  current_schedule: u32,
+  pub data_check: String,
+  pub save_version: u32,
+  pub schedules: Vec<Schedule>,
+  pub current_schedule: u32,
 }
