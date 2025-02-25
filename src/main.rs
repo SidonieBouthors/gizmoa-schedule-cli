@@ -2,9 +2,12 @@ use std::fs;
 
 use clap::Parser;
 use model::{Args, ScheduleSave};
+use vectorial::save_vector_schedule;
 
+mod color;
 pub mod model;
 mod parser;
+mod vectorial;
 
 fn main() {
   let args = Args::parse();
@@ -14,4 +17,6 @@ fn main() {
     serde_json::from_str(&json_content).expect("JSON was not well-formatted");
 
   print!("{:?}", schedule_save);
+
+  save_vector_schedule(&schedule_save.schedules[0]);
 }
