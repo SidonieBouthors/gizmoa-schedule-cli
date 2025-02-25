@@ -1,5 +1,5 @@
 [package]
-name = "gizmoa-schedule-ext"
+name = "gizmoa-schedule-cli"
 version = "0.1.0"
 edition = "2021"
 

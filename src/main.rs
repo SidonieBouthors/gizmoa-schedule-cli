@@ -16,7 +16,5 @@ fn main() {
   let schedule_save: ScheduleSave =
     serde_json::from_str(&json_content).expect("JSON was not well-formatted");
 
-  print!("{:?}", schedule_save);
-
   save_vector_schedule(&schedule_save.schedules[0]);
 }

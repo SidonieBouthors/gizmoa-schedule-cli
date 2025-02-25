@@ -1,5 +1,3 @@
-
-use chrono::Timelike;
 use strum::IntoEnumIterator;
 use svg::{
   node::element::{Line, Rectangle, Text},
@@ -151,7 +149,7 @@ fn draw_event(
   mut document: Document,
   item: &ScheduleItem,
   config: &ScheduleConfig,
-  (start_hour, end_hour): (u32, u32),
+  (start_hour, _end_hour): (u32, u32),
 ) -> Document {
   for slot in &item.meeting_times {
     let start_minutes = slot.start.to_minutes() as f32;
